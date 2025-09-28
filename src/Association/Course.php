@@ -1,5 +1,5 @@
 <?php
-namespace Uml\Association\Simple;
+namespace Uml\Association;
 
 class Course {
     private string $code;

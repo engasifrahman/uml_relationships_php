@@ -2,9 +2,9 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Uml\Association\Simple\Course;
-use Uml\Association\Simple\Student;
-use Uml\Association\Simple\Professor;
+use Uml\Association\Course;
+use Uml\Association\Student;
+use Uml\Association\Professor;
 
 // 🚀 Usage
 $profSmith = new Professor("Dr. Smith");

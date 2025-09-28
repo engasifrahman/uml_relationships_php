@@ -1,6 +1,6 @@
 <?php
 
-namespace Uml\Association\Simple;
+namespace Uml\Association;
 
 class Student {
     private string $name;

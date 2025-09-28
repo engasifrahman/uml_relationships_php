@@ -1,9 +1,9 @@
 <?php
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use Uml\Realization\Circle;
 use Uml\Realization\Rectangle;
-
-require_once __DIR__ . '/../vendor/autoload.php';
 
 // 🚀 Usage
 $circle = new Circle(5.0);

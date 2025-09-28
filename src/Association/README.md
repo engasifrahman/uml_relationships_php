@@ -115,30 +115,173 @@ classDiagram
 
 ## 🔄 8. Association Variants
 
-#### Uni-directional Association
+- ### ➡️ Uni-directional Association
+**One-way relationship where only one class knows about the other**
+
 ```php
 class Order {
     private Customer $customer; // Order knows Customer
-    // Customer doesn't know about Order
+    
+    public function __construct(Customer $customer) {
+        $this->customer = $customer;
+    }
 }
 
 class Customer {
-    // No reference to Order
+    private string $name;
+    // No reference to Order - Customer doesn't know about Order
 }
+
+// Usage
+$customer = new Customer("John");
+$order = new Order($customer);
+// Order can access Customer, but Customer cannot access Order
 ```
 
-#### Bi-directional Association
+- ### ↔️ Bi-directional Association
+**Two-way relationship where both classes know about each other**
+
 ```php
-class Order {
-    private Customer $customer;
+class Professor {
+    private string $name;
+    private array $courses = [];
+    
+    public function addCourse(Course $course): void {
+        $this->courses[] = $course;
+        $course->setProfessor($this); // Set the reverse reference
+    }
 }
 
-class Customer {
-    private array $orders = []; // Customer also knows Orders
+class Course {
+    private string $title;
+    private ?Professor $professor = null;
+    
+    public function setProfessor(Professor $professor): void {
+        $this->professor = $professor;
+    }
 }
+
+// Usage
+$professor = new Professor("Dr. Smith");
+$course = new Course("Mathematics");
+$professor->addCourse($course);
+// Both Professor and Course can access each other
 ```
 
-## 🆚 9. Association vs Other Relationships
+- ### 🔄 Reflexive Association
+**Relationship where objects of the same class are associated with each other**
+
+```php
+class Employee {
+    private string $name;
+    private ?Employee $manager = null;
+    private array $subordinates = [];
+    
+    public function addSubordinate(Employee $employee): void {
+        $this->subordinates[] = $employee;
+        $employee->setManager($this);
+    }
+    
+    public function setManager(Employee $manager): void {
+        $this->manager = $manager;
+    }
+}
+
+// Usage - Organizational Hierarchy
+$ceo = new Employee("Alice");
+$manager = new Employee("Bob");
+$developer = new Employee("Charlie");
+
+$ceo->addSubordinate($manager);
+$manager->addSubordinate($developer);
+// Employees can have managers and subordinates (same class)
+```
+
+- ### ❓ Optional Association
+**Relationship where the association may or may not exist (0..1 multiplicity)**
+
+```php
+class User {
+    private string $username;
+    private ?Profile $profile = null; // Optional association
+    
+    public function setProfile(?Profile $profile): void {
+        $this->profile = $profile;
+    }
+    
+    public function getProfile(): ?Profile {
+        return $this->profile;
+    }
+}
+
+class Profile {
+    private string $bio;
+    private User $user; // Mandatory association back to User
+}
+
+// Usage
+$user1 = new User("john_doe");
+$user2 = new User("jane_smith");
+
+$profile = new Profile("Software developer");
+$user1->setProfile($profile); // User1 has a profile
+// User2 has no profile (optional association is null)
+```
+## 🆚 9. Association Variants Comparisions
+
+| Association Type | Symbol | Lifecycle | Example |
+|-----------------|---------|-----------|---------|
+| **Uni-directional** | `─────→` | Independent | `Order → Customer` |
+| **Bi-directional** | `──────` | Independent | `Professor ↔ Course` |
+| **Reflexive** | `──────` | Independent | `Employee → Employee` |
+| **Optional** | `0..1 ───` | Independent | `User 0..1 ─── Profile` |
+
+## 📊 10. Association Variants Diagram
+```mermaid
+classDiagram
+    %% Uni-directional
+    class Order {
+        -Customer customer
+    }
+    class Customer {
+        -String name
+    }
+    
+    %% Bi-directional  
+    class Professor {
+        -Course[] courses
+        +addCourse(Course course)
+    }
+    class Course {
+        -Professor professor
+        +setProfessor(Professor prof)
+    }
+    
+    %% Reflexive
+    class Employee {
+        -Employee manager
+        -Employee[] subordinates
+        +addSubordinate(Employee emp)
+    }
+    
+    %% Optional
+    class User {
+        -Profile profile
+        +setProfile(Profile profile)
+    }
+    class Profile {
+        -String bio
+        -User user
+    }
+    
+    %% Relationships
+    Order --> Customer : "uni-directional"
+    Professor -- Course : "bi-directional"
+    Employee --> Employee : "manages"
+    User "0..1" -- "1" Profile : "optional"
+```
+
+## 🆚 11. Association vs Other Relationships
 
 | Aspect | Association 🤝 | Aggregation ◇ | Composition ◆ |
 |--------|---------------|---------------|----------------|
@@ -147,20 +290,27 @@ class Customer {
 | **Ownership** | No | Shared | Exclusive |
 | **Strength** | Medium | Medium | Strong |
 
-## 🗺️ 10. Quick Decision Guide
+## 🗺️ 12. Quick Decision Guide
 
 ```mermaid
 graph TD
-    A[Design Relationship] --> B{Need structural connection?}
-    B -->|Yes| C{Lifecycle dependent?}
-    C -->|Yes| D[Use Composition ◆]
-    C -->|No| E{Collection of independent objects?}
-    E -->|Yes| F[Use Aggregation ◇]
-    E -->|No| G[Use Association ────]
-    
-    G --> H{Set multiplicity}
-    H --> I{Set directionality}
-    I --> J[Success! 🚀]
+    A[Choose Relationship] --> B{Is it is-a?}
+    B -->|Yes| C[Inheritance]
+    B -->|No| D{Is it has-a?}
+    D -->|Yes| E{Independent lifecycle?}
+    E -->|Yes| F[Aggregation]
+    E -->|No| G[Composition]
+    D -->|No| H{Structural connection?}
+    H -->|Yes| I{Between same class?}
+    I -->|Yes| J[Reflexive Association]
+    I -->|No| K{One-way or two-way?}
+    K -->|One-way| L[Uni-directional Association]
+    K -->|Two-way| M[Bi-directional Association]
+    K -->|Optional| N[Optional Association]
+    H -->|No| O{Temporary usage?}
+    O -->|Yes| P[Dependency]
+    O -->|No| Q{Interface contract?}
+    Q -->|Yes| R[Realization]
 ```
 
 ---
