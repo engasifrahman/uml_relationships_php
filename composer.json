@@ -1,0 +1,21 @@
+{
+    "name": "engasifrahman/uml_relationships_php",
+    "description": "UML relationships in PHP with examples and mermaid diagrams",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Md. Asif Rahman",
+            "email": "eng.asifrahman@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Uml\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
